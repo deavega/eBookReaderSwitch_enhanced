@@ -1,65 +1,110 @@
-# eBookReaderSwitch
+# eBookReader for Nintendo Switch
 
-### Features:
-* Saves last page number
-* Reads PDF, EPUB, CBZ, and XPS files
-* Dark and light mode
-* Landscape reading view
-* Portrait reading view
-* Touch screen controls
-	* Touch the botton/top of the screen to zoom in/out and left and right to change the page.
-* Books read from `/switch/eBookReader/books`
+An e-book and document reader homebrew application for the Nintendo Switch powered by **MuPDF** and **SDL2**.
 
-### TODO:
-* Do some extra testing on file compatibility.
-* 2 pages side by side in landscape.
-* Hardware lock to prevent accidental touches (maybe Vol- ?) (?).
-* Save orientation, and dark mode settings.
+---
 
-### Screen Shots:
+## Features
 
-Dark Mode Help Menu:
-<br></br>
-<img src="screenshots/darkModeHelp.jpg" width="322" height="178.4">
-<br></br>
+* **Multi-Format Support:** EPUB, PDF, CBZ, XPS, FB2, and TXT.
+* **Dual Orientation Modes:**
+* **Portrait Mode:** Standard horizontal view with generous reading margins.
+* **Landscape (Rotated 90°) Mode:** Hold the console vertically like a real book, featuring crisp 1:1 rendering and comfortable top/bottom padding.
 
-Dark Mode Landscape Reading (With the Switch horizonal):
-<br></br>
-<img src="screenshots/darkModeLandscape.jpg" width="512" height="288">
-<br></br>
 
-Dark Mode Portrait Reading (With the Switch vertical):
-<br></br>
-<img src="screenshots/darkModePortrait.jpg" width="285.6" height="408.8">
-<br></br>
+* **Custom Font Engine:** Support for user-provided TrueType fonts (`.ttf`) with dynamic runtime switching across Serif, Sans-Serif, and Monospace families.
+* **Interactive Cover Cards:** Dynamic colored cards with title initials generated for files without embedded cover art.
+* **Touchscreen & Joy-Con Controls:** Full touch navigation (swipe, drag-to-pan, tap-to-turn, corner/two-finger exit) alongside physical button mappings.
+* **Reading Utilities:** Auto-saving last read page per book, bookmark management, dark/light theme toggle, and font size adjustment.
 
-Dark Mode Book Selection:
-<br></br>
-<img src="screenshots/darkModeSelection.jpg" width="512" height="288">
-<br></br>
+---
 
-Light Mode Landscape Reading:
-<br></br>
-<img src="screenshots/lightModeLandscape.jpg" width="512" height="288">
+## Directory Structure
 
-### Credit:
-* moronigranja - For allowing more file support
-* NX-Shell Team - A good amount of the code is from an old version of their application.
+Place your books and font files onto your Switch SD card in the following directories:
 
-### Building
-* Release built with [libnx release v4.1.3](https://github.com/switchbrew/libnx).
-* Uses `freetype` and other libs which comes with `switch-portlibs` via `devkitPro pacman`:
+* `sdmc:/switch/eBookReader/eBookReader.nro`
+* `sdmc:/switch/eBookReader/saved_pages.cfg` *(Auto-generated)*
+* `sdmc:/switch/eBookReader/books/` *(Place `.epub`, `.pdf`, `.cbz` files here)*
+* `sdmc:/switch/eBookReader/fonts/Serif.ttf`
+* `sdmc:/switch/eBookReader/fonts/Sans.ttf`
+* `sdmc:/switch/eBookReader/fonts/Mono.ttf`
+
+---
+
+## Controls
+
+### Physical Controls
+
+| Button / Input | Action |
+| --- | --- |
+| **D-Pad Left / Right** | Previous / Next page (Portrait) |
+| **D-Pad Up / Down** | Bookmark: Up to add/remove, Down to jump |
+| **L / R** | Jump 10 pages backward / forward |
+| **ZL / ZR** | Decrease / Increase font size (EPUB/reflow) |
+| **A** | Cycle font family (`Serif` → `Sans-serif` → `Monospace`) |
+| **B** | Exit to main menu / Close help overlay |
+| **Y** | Toggle layout orientation (Portrait / 90° Rotated Landscape) |
+| **X** | Toggle reading status bar |
+| **Minus (-)** | Toggle Dark / Light theme |
+| **Plus (+)** | Show / Hide Help Menu |
+| **Left Stick** | Pan page (when zoomed) |
+| **Right Stick Up / Down** | Zoom in / Zoom out |
+| **Left / Right Stick Click** | Reset page zoom & position |
+
+### Touch Controls
+
+| Gesture | Action |
+| --- | --- |
+| **Left / Right Side Tap** | Previous / Next page |
+| **Center Tap** | Toggle reading status bar |
+| **Horizontal Swipe** | Turn page forward / backward |
+| **Drag (when zoomed)** | Pan page viewport |
+| **Top-Right Corner Tap** | Exit reader to book menu (Joy-Con detached mode) |
+| **Two-Finger Tap** | Exit reader to book menu (Joy-Con detached mode) |
+
+---
+
+## Recommended Fonts
+
+You can download standard, open-source `.ttf` fonts from Google Fonts and rename them to match the expected filenames:
+
+* **Serif (`Serif.ttf`):** Literata, Merriweather, or Georgia
+* **Sans-serif (`Sans.ttf`):** Roboto, Inter, or Open Sans
+* **Monospace (`Mono.ttf`):** Roboto Mono or JetBrains Mono
+
+---
+
+## Building from Source
+
+### Prerequisites
+
+* devkitPro with `devkitA64` toolchain
+* `libnx`, `switch-sdl2`, `switch-sdl2_ttf`, `switch-sdl2_image`, `switch-libconfig`, and `switch-mupdf` libraries
+
+Install dependencies via pacman:
+
+```bash
+dkp-pacman -S switch-dev switch-sdl2 switch-sdl2_ttf switch-sdl2_image switch-libconfig switch-mupdf
+
 ```
-pacman -S libnx switch-portlibs
-```
-then run:
-```
-make mupdf
-make
-```
-to build.
 
-If you don't have twili debugger installed, delete the `-ltwili` flag on the Makefile to compile:
+### Compilation
+
+Clone the repository and build the `.nro` binary:
+
+```bash
+git clone https://github.com/your-username/eBookReader-Switch.git
+cd eBookReader-Switch
+make clean
+make NODEBUG=1
+
 ```
-LIBS: -ltwili
-```
+
+Copy the generated `eBookReader.nro` to `/switch/eBookReader/` on your SD card.
+
+---
+
+## License
+
+This project is open-source software licensed under the MIT License. Document rendering is powered by the MuPDF library (AGPL/Commercial license).
