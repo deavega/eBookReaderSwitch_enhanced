@@ -1,6 +1,11 @@
 # eBookReader for Nintendo Switch
 
-An e-book and document reader homebrew application for the Nintendo Switch powered by **MuPDF** and **SDL2**.
+This is a forked and enhanced version from [Sean](https://github.com/SeanOMik/eBookReaderSwitch). An e-book and document reader homebrew application for the Nintendo Switch powered by **MuPDF** and **SDL2**. Still buggy (i.e. font changing is not working and maybe become part of future development; not all epub files are compatible). 
+>Added features are **bookmarking, larger default font size, book cover art thumbnail**.
+
+Use your own NSP Forwarder to add the NRO's shorcut on the HOME menu (Look at **Release** for the NRO). 
+
+Credit belongs to the original developer @SeanOMik.
 
 ---
 
@@ -10,12 +15,18 @@ An e-book and document reader homebrew application for the Nintendo Switch power
 * **Dual Orientation Modes:**
 * **Portrait Mode:** Standard horizontal view with generous reading margins.
 * **Landscape (Rotated 90°) Mode:** Hold the console vertically like a real book, featuring crisp 1:1 rendering and comfortable top/bottom padding.
-
-
 * **Custom Font Engine:** Support for user-provided TrueType fonts (`.ttf`) with dynamic runtime switching across Serif, Sans-Serif, and Monospace families.
 * **Interactive Cover Cards:** Dynamic colored cards with title initials generated for files without embedded cover art.
 * **Touchscreen & Joy-Con Controls:** Full touch navigation (swipe, drag-to-pan, tap-to-turn, corner/two-finger exit) alongside physical button mappings.
 * **Reading Utilities:** Auto-saving last read page per book, bookmark management, dark/light theme toggle, and font size adjustment.
+
+![Sample Image](https://res.cloudinary.com/dayer1hez/image/upload/w_0.6,c_scale/v1787029907/2026081812053700-AD808EFD2C53DCD6F8380113B64A0DD4_otcpp0.jpg)
+
+![Sample Image](https://res.cloudinary.com/dayer1hez/image/upload/w_0.6,c_scale/v1787029907/2026081812055400-AD808EFD2C53DCD6F8380113B64A0DD4_e4ikk0.jpg)
+
+![Sample Image](https://res.cloudinary.com/dayer1hez/image/upload/w_0.6,c_scale/v1787029907/2026081812173900-96348BC3A80D3510E6442162AAEBE4ED_dhffno.jpg)
+
+![Sample Image](https://res.cloudinary.com/dayer1hez/image/upload/w_0.6,c_scale/v1787029907/2026081812170100-57B4628D2267231D57E0FC1078C0596D_y0olyw.jpg)
 
 ---
 
@@ -101,10 +112,20 @@ make NODEBUG=1
 
 ```
 
-Copy the generated `eBookReader.nro` to `/switch/eBookReader/` on your SD card.
+Copy the generated `eBookReader.nro` to `/switch/eBookReader/` on your SD card. Use NSP Forwarder to ease access to eBookReader.
+
+---
+## Support Me
+
+<p>Buying me a coffee to support this project and future enhancements...</p>
+<a href="https://ko-fi.com/vegatroz" target="_blank">
+  <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="48" alt="Buy Me a Coffee at ko-fi.com" />
+</a>
 
 ---
 
 ## License
 
 This project is open-source software licensed under the MIT License. Document rendering is powered by the MuPDF library (AGPL/Commercial license).
+
+
