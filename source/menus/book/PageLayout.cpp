@@ -47,6 +47,15 @@ void PageLayout::move_right() {
     move_page(3, 0);
 };
 
+void PageLayout::pan(float dx, float dy) {
+    // move_page is virtual, so landscape's rotated mapping is respected.
+    move_page(dx, dy);
+};
+
+bool PageLayout::is_zoomed() {
+    return zoom > min_zoom * 1.02f;
+};
+
 void PageLayout::reset() {
     page_center = fz_make_point(viewport.w / 2, viewport.h / 2);
     set_zoom(min_zoom);

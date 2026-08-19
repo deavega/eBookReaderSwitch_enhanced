@@ -24,6 +24,11 @@ class PageLayout
         {
             return _current_page;
         }
+
+        int total_pages()
+        {
+            return pages_count;
+        }
     
         virtual void previous_page(int n);
         virtual void next_page(int n);
@@ -33,6 +38,12 @@ class PageLayout
         virtual void move_down();
         virtual void move_left();
         virtual void move_right();
+
+        // Pan the page by an arbitrary pixel delta (used for touch dragging).
+        void pan(float dx, float dy);
+        // True once the user has zoomed in past the fit-to-screen level.
+        bool is_zoomed();
+
         virtual void reset();
         virtual void draw_page();
         virtual char* info();

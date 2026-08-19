@@ -9,11 +9,22 @@
 static char *Clock_GetCurrentTime(void) {
 	static char buffer[10];
 
-    time_t unixTime = time(NULL);
-	struct tm* timeStruct = gmtime((const time_t *)&unixTime);
-	int hours = (timeStruct->tm_hour);
-	int minutes = timeStruct->tm_min;
-	
+	// gmtime() always shows raw UTC -- it ignores whatever timezone is
+	// actually configured on the console. This app's timeInitialize() call
+	// (in main.cpp) sets up libnx's Time service, so ask it directly for
+	// the calendar time under the console's configured region instead.
+	int hours = 0, minutes = 0;
+
+	u64 timestamp = 0;
+	if (R_SUCCEEDED(timeGetCurrentTime(TimeType_UserSystemClock, &timestamp))) {
+		TimeCalendarTime caltime;
+		TimeCalendarAdditionalInfo addinfo;
+		if (R_SUCCEEDED(timeToCalendarTimeWithMyRule(timestamp, &caltime, &addinfo))) {
+			hours = caltime.hour;
+			minutes = caltime.minute;
+		}
+	}
+
 	bool amOrPm = false;
 	
 	if (hours < 12)
@@ -31,7 +42,9 @@ static char *Clock_GetCurrentTime(void) {
 	return buffer;
 }
 
-static void StatusBar_GetBatteryStatus(int x, int y) {
+// Draws the battery icon+percentage so its right edge lands exactly at
+// `right_edge` -- callers no longer need to guess its width up front.
+static void StatusBar_GetBatteryStatus(int right_edge, int y) {
 	u32 percent = 0;
 	//ChargerType state;
 	PsmChargerType state;
@@ -106,11 +119,14 @@ static void StatusBar_GetBatteryStatus(int x, int y) {
 
 		snprintf(buf, 5, "%d%%", percent);
 		TTF_SizeText(ROBOTO_20, buf, &width, NULL);
-		SDL_DrawHorizonalAlignedImageText(RENDERER, batteryImage, ROBOTO_20, WHITE, buf, (x + width - 30), y, 34, 34, -2, 0);
+		// Icon (34px) + a -2px gap + the text should end exactly at right_edge.
+		int x = right_edge - 34 - (-2) - width;
+		SDL_DrawHorizonalAlignedImageText(RENDERER, batteryImage, ROBOTO_20, WHITE, buf, x, y, 34, 34, -2, 0);
 		//SDL_DrawText(RENDERER, ROBOTO_20, (x + width + 5), y, WHITE, buf);
 	} else {
 		snprintf(buf, 5, "%d%%", percent);
 		TTF_SizeText(ROBOTO_20, buf, &width, NULL);
+		int x = right_edge - 34 - (-2) - width;
 		SDL_DrawHorizonalAlignedImageText(RENDERER, battery_unknown, ROBOTO_20, WHITE, buf, x, y, 34, 34, -2, 0);
 		/*SDL_DrawText(RENDERER, ROBOTO_20, (x + width + 5), y, WHITE, buf);
 		SDL_DrawImage(RENDERER, battery_unknown, x, 1);*/
@@ -133,8 +149,30 @@ void StatusBar_DisplayTime(bool portriat) {
 		SDL_DrawRotatedText(RENDERER, ROBOTO_20, (double) 90, helpX, helpY, WHITE, "\"+\" - Help");
 		//SDL_DrawRotatedText(RENDERER, ROBOTO_25, (double) 90, 1270 - width, (720 - height), WHITE, Clock_GetCurrentTime());
 	} else {
-		SDL_DrawText(RENDERER, ROBOTO_25, 1260 - timeWidth, (40 - timeHeight) / 2, WHITE, Clock_GetCurrentTime());
-		SDL_DrawText(RENDERER, ROBOTO_20, 1260 - helpWidth - timeWidth - 25, (40 - helpHeight) / 2, WHITE, "\"+\" - Help");
-		StatusBar_GetBatteryStatus(1260 - (timeWidth + helpWidth) - 110, (40 - timeHeight) / 2 + 34); // 34 is height of battery img
+		// Positioned sequentially from the right edge using each element's
+		// real measured width, so nothing can drift into anything else --
+		// the previous fixed offsets assumed a battery percentage of a
+		// specific digit count and drifted into the help text otherwise.
+		const int rightMargin = 1260;
+		const int gap = 22;
+
+		int timeX = rightMargin - timeWidth;
+		SDL_DrawText(RENDERER, ROBOTO_25, timeX, (40 - timeHeight) / 2, WHITE, Clock_GetCurrentTime());
+
+		int battRightEdge = timeX - gap;
+		StatusBar_GetBatteryStatus(battRightEdge, 40);
+
+		// Width of the battery widget (icon + gap + percentage text), so the
+		// help text can start after it without needing to know its innards.
+		char battBuf[5];
+		int battTextWidth = 0;
+		u32 battPercent = 0;
+		psmGetBatteryChargePercentage(&battPercent);
+		snprintf(battBuf, 5, "%d%%", battPercent);
+		TTF_SizeText(ROBOTO_20, battBuf, &battTextWidth, NULL);
+		int battWidgetWidth = 34 - (-2) + battTextWidth;
+
+		int helpX = battRightEdge - battWidgetWidth - gap - helpWidth;
+		SDL_DrawText(RENDERER, ROBOTO_20, helpX, (40 - helpHeight) / 2, WHITE, "\"+\" - Help");
 	}
 }

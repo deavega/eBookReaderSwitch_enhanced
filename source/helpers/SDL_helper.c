@@ -1,6 +1,7 @@
 #include "common.h"
 #include "SDL_helper.h"
 #include <SDL2/SDL_image.h>
+#include <math.h>
 
 void SDL_ClearScreen(SDL_Renderer *renderer, SDL_Color colour) {
 	SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
@@ -15,7 +16,13 @@ void SDL_DrawRect(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Color 
 }
 
 void SDL_DrawCircle(SDL_Renderer *renderer, int x, int y, int r, SDL_Color colour) {
-	filledCircleRGBA(renderer, x, y, r, colour.r, colour.g, colour.b, colour.a);
+	// Plain-SDL filled circle (avoids the SDL2_gfx dependency the original
+	// filledCircleRGBA call required, which this project never linked).
+	SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
+	for (int dy = -r; dy <= r; dy++) {
+		int dx = (int) (sqrt((double)(r * r - dy * dy)) + 0.5);
+		SDL_RenderDrawLine(renderer, x - dx, y + dy, x + dx, y + dy);
+	}
 	return;
 }
 
@@ -41,8 +48,6 @@ void SDL_DrawRotatedText(SDL_Renderer *renderer, TTF_Font *font, double rotation
 	SDL_Rect position;
 	position.x = x; position.y = y;
 	SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-	SDL_Point center = {position.w / 2, position.h / 2};
-    SDL_Rect crop = {0, 0, &position.w, &position.h};
 
 	SDL_SetRenderTarget(renderer, texture);
 	SDL_RenderCopyEx(RENDERER, texture, NULL, &position, rotation, NULL, SDL_FLIP_NONE);

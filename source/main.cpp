@@ -120,7 +120,7 @@ void Init_Services() {
     FS_RecursiveMakeDir("/switch/eBookReader/books");
     std::cout << "Created book directory if needed" << std::endl;
 
-    configDarkMode = true;
+    configDarkMode = false;
 }
 
 int main(int argc, char *argv[]) {
